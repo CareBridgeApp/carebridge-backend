@@ -12,11 +12,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -69,6 +72,30 @@ public class DoctorController {
         }catch (Exception e){
             log.error("error while searching doctordetails!",e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+    @PutMapping(
+            value = "/profile-picture",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<?> uploadProfilePicture(
+            @RequestParam("file") MultipartFile file) throws IOException {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            ObjectId id = userDetails.getId();
+            String imageUrl =
+                    doctorService.uploadProfilePicture(file, id);
+
+            return ResponseEntity.ok(
+                    Map.of(
+                            "message", "Profile picture updated successfully!",
+                            "profilePictureUrl", imageUrl
+                    )
+            );
+        }catch (Exception e){
+            return new ResponseEntity<>(Map.of("message","Error while uploading profile picture")
+                    , HttpStatus.BAD_REQUEST);
         }
     }
 }

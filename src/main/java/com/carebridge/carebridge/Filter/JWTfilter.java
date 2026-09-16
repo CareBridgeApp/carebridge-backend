@@ -41,19 +41,16 @@ public class JWTfilter extends OncePerRequestFilter {
         String jwt = null;
         String userId = null;
 
-        // 1. Get cookies from the request
-        Cookie[] cookies = request.getCookies();
+        // Get Authorization header
+        final String authHeader =
+                request.getHeader("Authorization");
 
-        // 2. Find the JWT cookie
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("accessToken".equals(cookie.getName())) {
-                    jwt = cookie.getValue();
-                    break;
-                }
-            }
+// Extract JWT from "Bearer <token>"
+        if (authHeader != null &&
+                authHeader.startsWith("Bearer ")) {
+
+            jwt = authHeader.substring(7);
         }
-
         // 3. Make sure JWT exists
         if (jwt != null) {
             try {

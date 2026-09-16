@@ -48,7 +48,7 @@ public class AppSecurity {
                         session->session
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtfilter, UsernamePasswordAuthenticationFilter.class);
 
 
         return http.build();

@@ -7,4 +7,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface PatientRepo extends MongoRepository<PatientDetails, ObjectId> {
     PatientDetails findByUserid(ObjectId userid);
 
+
 }

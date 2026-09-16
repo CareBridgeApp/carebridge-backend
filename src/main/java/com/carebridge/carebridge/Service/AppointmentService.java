@@ -13,6 +13,7 @@ import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
@@ -62,6 +63,7 @@ public class AppointmentService {
                 )
                 .toList();
     }
+    @Transactional
     public Appointments addAppointment(ObjectId id, AppointmentRequestDTO request) {
         PatientDetails patient=patientRepo.findByUserid(id);
         DoctorDetails doctor=doctorRepo.findById(request.getDoctorId())
