@@ -17,7 +17,7 @@ public class CloudinaryService {
         this.cloudinary = cloudinary;
     }
 
-    public String uploadProfilePicture(MultipartFile file, String folder)
+    public Map<String, String> uploadProfilePicture(MultipartFile file, String folder)
             throws IOException {
 
         Map<?, ?> result = cloudinary.uploader().upload(
@@ -27,8 +27,24 @@ public class CloudinaryService {
                         "resource_type", "image"
                 )
         );
+        String url = result.get("secure_url").toString();
+        String publicId = result.get("public_id").toString();
 
-        return result.get("secure_url").toString();
+        return Map.of(
+                "url", url,
+                "publicId", publicId
+        );
+    }
+
+    public void deleteProfilePicture(String publicId)
+            throws IOException {
+
+        cloudinary.uploader().destroy(
+                publicId,
+                ObjectUtils.asMap(
+                        "resource_type", "image"
+                )
+        );
     }
 }
 

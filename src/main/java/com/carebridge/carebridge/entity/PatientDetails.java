@@ -26,4 +26,5 @@ public class PatientDetails {
     private String state;
     private String city;
     private String profilePictureUrl;
+    private String profilePicturePublicId;
 }

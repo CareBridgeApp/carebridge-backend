@@ -4,6 +4,7 @@ import com.carebridge.carebridge.Repository.DoctorRepo;
 import com.carebridge.carebridge.Repository.UserRepo;
 import com.carebridge.carebridge.Utils.ImageValidator;
 import com.carebridge.carebridge.entity.DoctorDetails;
+import com.carebridge.carebridge.entity.PatientDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -42,16 +44,33 @@ public class DoctorService {
         DoctorDetails doctor = doctorRepo
                 .findByUserid(userid);
 
-        String imageUrl = cloudinaryService.uploadProfilePicture(
+        Map<String,String> result= cloudinaryService.uploadProfilePicture(
                 file,
                 "carebridge/doctors"
         );
 
-        doctor.setProfilePictureUrl(imageUrl);
-
+        doctor.setProfilePictureUrl(result.get("url"));
+        doctor.setProfilePicturePublicId(result.get("publicId"));
         doctorRepo.save(doctor);
 
-        return imageUrl;
+        return result.get("url");
+    }
+    public void deleteProfilePicture(ObjectId userId)
+            throws IOException {
+
+        DoctorDetails doctor = doctorRepo
+                .findByUserid(userId);
+
+        String publicId = doctor.getProfilePicturePublicId();
+
+        if (publicId != null) {
+            cloudinaryService.deleteProfilePicture(publicId);
+        }
+
+        doctor.setProfilePictureUrl(null);
+        doctor.setProfilePicturePublicId(null);
+
+        doctorRepo.save(doctor);
     }
 }
 

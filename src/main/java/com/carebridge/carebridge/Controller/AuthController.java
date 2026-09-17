@@ -134,15 +134,15 @@ public class AuthController {
             ResponseCookie refreshCookie =
                     ResponseCookie.from("refreshToken", refreshToken)
                             .httpOnly(true)
-                            .secure(false)
-                            .sameSite("Lax")
-                            .path("/api/auth")
+                            .secure(true)
+                            .sameSite("None")
+                            .path("/api/auth/refresh")
                             .maxAge(Duration.ofDays(7))
                             .build();
             ResponseCookie accessCookie=ResponseCookie.from("jwt",accessToken)
                     .httpOnly(true)
-                    .secure(false)
-                    .sameSite("Lax")
+                    .secure(true)
+                    .sameSite("None")
                     .path("/")
                     .maxAge(Duration.ofHours(4))
                     .build();

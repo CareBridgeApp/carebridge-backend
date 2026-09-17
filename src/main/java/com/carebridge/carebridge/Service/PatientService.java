@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -54,16 +55,34 @@ public class PatientService {
 
         PatientDetails patient = patientRepo
                 .findByUserid(userid);
-        String imageUrl = cloudinaryService.uploadProfilePicture(
+        Map<String,String> result = cloudinaryService.uploadProfilePicture(
                 file,
                 "carebridge/patients"
         );
 
-        patient.setProfilePictureUrl(imageUrl);
+        patient.setProfilePictureUrl(result.get("url") );
+        patient.setProfilePicturePublicId(result.get("publicId"));
 
         patientRepo.save(patient);
 
-        return imageUrl;
+        return result.get("url");
+    }
+    public void deleteProfilePicture(ObjectId userId)
+            throws IOException {
+
+        PatientDetails patient = patientRepo
+                .findByUserid(userId);
+
+        String publicId = patient.getProfilePicturePublicId();
+
+        if (publicId != null) {
+            cloudinaryService.deleteProfilePicture(publicId);
+        }
+
+        patient.setProfilePictureUrl(null);
+        patient.setProfilePicturePublicId(null);
+
+        patientRepo.save(patient);
     }
 
 }

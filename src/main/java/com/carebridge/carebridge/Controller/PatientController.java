@@ -79,5 +79,17 @@ public class PatientController {
                     , HttpStatus.BAD_REQUEST);
         }
     }
+    @DeleteMapping("/delete/profile-picture")
+    public ResponseEntity<?> deleteProfilePicture(){
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            ObjectId id = userDetails.getId();
+            patientService.deleteProfilePicture(id);
+            return new ResponseEntity<>(Map.of("message", "Profile picture deleted successfully!"), HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>("error while deleting profile picture", HttpStatus.BAD_REQUEST);
+        }
+    }
 
 }
