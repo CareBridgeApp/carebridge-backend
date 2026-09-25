@@ -31,4 +31,6 @@ public interface AppointmentRepo extends MongoRepository<Appointments, ObjectId>
             LocalDateTime start,
             LocalDateTime end
     );
+
+
 }

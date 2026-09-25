@@ -117,6 +117,13 @@ public class AppointmentService {
         appointment.setStatus(AppointmentStatus.CANCELLED);
         return appointmentRepo.save(appointment);
     }
-
-
+    public Appointments CompleteAppointment(ObjectId userid, ObjectId appointmentId) throws AccessDeniedException {
+        DoctorDetails doctor=doctorRepo.findByUserid(userid);
+        Appointments appointment=appointmentRepo.findById(appointmentId).orElseThrow(()->new RuntimeException("Appointment Not Found"));
+        if(!appointment.getStatus().equals(AppointmentStatus.CONFIRMED)) {
+            throw  new AccessDeniedException("Confirm the appointment to be completed!");
+        }
+        appointment.setStatus(AppointmentStatus.COMPLETED);
+        return appointmentRepo.save(appointment);
+    }
 }

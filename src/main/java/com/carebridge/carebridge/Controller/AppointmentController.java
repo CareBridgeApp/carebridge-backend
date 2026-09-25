@@ -1,9 +1,12 @@
 package com.carebridge.carebridge.Controller;
 
 import com.carebridge.carebridge.Exception.SlotAlreadyBookedException;
+import com.carebridge.carebridge.Repository.PatientRepo;
 import com.carebridge.carebridge.Service.AppointmentService;
 import com.carebridge.carebridge.Dto.AppointmentRequestDTO;
+import com.carebridge.carebridge.Service.DoctorPatientService;
 import com.carebridge.carebridge.entity.Appointments;
+import com.carebridge.carebridge.entity.PatientDetails;
 import com.carebridge.carebridge.entity.UserDetails;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,10 @@ import java.util.Map;
 public class AppointmentController {
     @Autowired
     private AppointmentService appointmentService;
+    @Autowired
+    private PatientRepo patientRepo;
+    @Autowired
+    private DoctorPatientService doctorPatientService;
     @PostMapping("/create")
     public ResponseEntity<?>createAppointment(@RequestBody AppointmentRequestDTO request) {
         try {
@@ -32,6 +39,12 @@ public class AppointmentController {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             ObjectId id = userDetails.getId();
             Appointments appointment = appointmentService.addAppointment(id, request);
+            PatientDetails patientDetails=patientRepo.findByUserid(id);
+            ObjectId patientId=patientDetails.getId();
+            ObjectId doctorId=request.getDoctorId();
+            if(!doctorPatientService.validateRelationship(doctorId,patientId)){
+                doctorPatientService.createRelationship(request,patientId);
+            }
             return new ResponseEntity<>(appointment, HttpStatus.OK);
         }catch (SlotAlreadyBookedException e){
             return new ResponseEntity<>(Map.of("message",e.getMessage()),HttpStatus.BAD_REQUEST);
@@ -83,7 +96,7 @@ public class AppointmentController {
             Appointments appointment=appointmentService.cancelAppointment(id,appointmentId);
             return new ResponseEntity<>(appointment, HttpStatus.OK);
         } catch (AccessDeniedException e) {
-            return  new ResponseEntity<>(Map.of("message",e.getMessage()),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(Map.of("message",e.getMessage()),HttpStatus.BAD_REQUEST);
         }
     }
     @GetMapping("/doctor/{doctorId}/date/{date}")
@@ -101,6 +114,18 @@ public class AppointmentController {
                 );
 
         return ResponseEntity.ok(bookedSlots);
+    }
+    @PatchMapping("/{appointmentId}/completed")
+    public ResponseEntity<?>completedAppointment(@PathVariable ObjectId appointmentId) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            ObjectId id = userDetails.getId();
+            Appointments appointments=appointmentService.CompleteAppointment(id,appointmentId);
+            return new ResponseEntity<>(appointments, HttpStatus.OK);
+        } catch (AccessDeniedException e) {
+            return new ResponseEntity<>(Map.of("message",e.getMessage()),HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

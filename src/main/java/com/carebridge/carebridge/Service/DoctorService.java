@@ -31,6 +31,7 @@ public class DoctorService {
         }catch (Exception e){
             log.error("Error occured while deleting DoctorDetails",e);
         }
+
     }
     public void updateDoctor(DoctorDetails doctorDetails) {
         doctorRepo.save(doctorDetails);
