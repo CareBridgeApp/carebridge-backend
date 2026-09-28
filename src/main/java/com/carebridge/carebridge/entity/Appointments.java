@@ -26,13 +26,8 @@ public class Appointments {
 
     private ObjectId patientId;
     private ObjectId doctorId;
-
     private LocalDateTime appointmentDate;
-
     private String reason;
-
     private AppointmentStatus status;
-
     private LocalDateTime createdAt;
-
 }

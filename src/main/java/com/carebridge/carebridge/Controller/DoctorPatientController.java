@@ -21,12 +21,13 @@ public class DoctorPatientController {
     @Autowired
     private DoctorPatientService doctorPatientService;
     @PatchMapping("/{relationshipId}/approve")
-    public ResponseEntity<?> approveRelationship(@PathVariable("relationshipId") ObjectId relationshipId){
+    public ResponseEntity<?> approveRelationship(@PathVariable("relationshipId") String relationship_Id){
         try{
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             ObjectId id = userDetails.getId();
-            doctorPatientService.approveRelationship(id, relationshipId);
+            ObjectId relationshipId = new ObjectId(relationship_Id);
+            doctorPatientService.approveRelationship(relationshipId,id);
             return new ResponseEntity<>(Map.of("message","Access granted!"), HttpStatus.OK);
         }catch(Exception e){
             return new ResponseEntity<>(Map.of("message",e.getMessage()), HttpStatus.BAD_REQUEST);

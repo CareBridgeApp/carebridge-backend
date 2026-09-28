@@ -1,5 +1,6 @@
 package com.carebridge.carebridge.Service;
 
+import com.carebridge.carebridge.Dto.AppointmentResponseDTO;
 import com.carebridge.carebridge.Enum.AppointmentStatus;
 import com.carebridge.carebridge.Exception.SlotAlreadyBookedException;
 import com.carebridge.carebridge.Repository.AppointmentRepo;
@@ -64,7 +65,7 @@ public class AppointmentService {
                 .toList();
     }
     @Transactional
-    public Appointments addAppointment(ObjectId id, AppointmentRequestDTO request) {
+    public AppointmentResponseDTO addAppointment(ObjectId id, AppointmentRequestDTO request) {
         PatientDetails patient=patientRepo.findByUserid(id);
         DoctorDetails doctor=doctorRepo.findById(request.getDoctorId())
                 .orElseThrow(()->new RuntimeException("Doctor Not Found"));
@@ -74,6 +75,7 @@ public class AppointmentService {
         }
 
         Appointments appointment = new Appointments();
+        AppointmentResponseDTO responseDTO = new AppointmentResponseDTO();
         appointment.setPatientId(patient.getId());
         appointment.setDoctorId(doctor.getId());
         appointment.setAppointmentDate(request.getAppointmentDate());
@@ -81,7 +83,12 @@ public class AppointmentService {
         appointment.setStatus(AppointmentStatus.PENDING);
         appointment.setCreatedAt(LocalDateTime.now());
         try{
-            return appointmentRepo.save(appointment);
+            Appointments appointments=appointmentRepo.save(appointment);
+            responseDTO.setReason(request.getReason());
+            responseDTO.setAppointmentDate(appointment.getAppointmentDate());
+            responseDTO.setAppointmentId(appointments.getId().toHexString());
+            responseDTO.setAppointmentStatus(appointments.getStatus());
+            return  responseDTO;
         }catch(DuplicateKeyException e){
             throw new SlotAlreadyBookedException("This time slot was just booked by another patient");
         }

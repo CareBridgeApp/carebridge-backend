@@ -52,20 +52,20 @@ public class MedicalRecordController {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             ObjectId id = userDetails.getId();
             ObjectId PatientId=new ObjectId(patientId);
-            List<MedicalRecord>records=medicalRecordService.getAllPatientsMedicalRecords(id,PatientId);
+            List<MedicalRecord>records=medicalRecordService.getAllPatientsMedicalRecords(PatientId,id);
             return new ResponseEntity<>(records,HttpStatus.OK);
         }catch(Exception e){
             return new ResponseEntity<>(Map.of("message",e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping("doctor/getAllRecords/{patientId}")
+    @GetMapping("doctor/getRecords/{patientId}")
     public ResponseEntity<?> getPatientRecords(@PathVariable("patientId") String patientId){
         try{
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             ObjectId id = userDetails.getId();
             ObjectId PatientId=new ObjectId(patientId);
-            List<MedicalRecord>records=medicalRecordService.getMedicalRecords(id,PatientId);
+            List<MedicalRecord>records=medicalRecordService.getMedicalRecords(PatientId,id);
             return new ResponseEntity<>(records,HttpStatus.OK);
         }catch(Exception e){
             return new ResponseEntity<>(Map.of("message",e.getMessage()), HttpStatus.BAD_REQUEST);

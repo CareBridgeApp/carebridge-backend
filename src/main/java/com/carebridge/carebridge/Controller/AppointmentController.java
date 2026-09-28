@@ -1,5 +1,6 @@
 package com.carebridge.carebridge.Controller;
 
+import com.carebridge.carebridge.Dto.AppointmentResponseDTO;
 import com.carebridge.carebridge.Exception.SlotAlreadyBookedException;
 import com.carebridge.carebridge.Repository.PatientRepo;
 import com.carebridge.carebridge.Service.AppointmentService;
@@ -38,7 +39,7 @@ public class AppointmentController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             ObjectId id = userDetails.getId();
-            Appointments appointment = appointmentService.addAppointment(id, request);
+            AppointmentResponseDTO appointment = appointmentService.addAppointment(id, request);
             PatientDetails patientDetails=patientRepo.findByUserid(id);
             ObjectId patientId=patientDetails.getId();
             ObjectId doctorId=request.getDoctorId();

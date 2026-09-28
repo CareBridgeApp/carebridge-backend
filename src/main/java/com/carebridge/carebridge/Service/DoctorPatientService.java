@@ -1,7 +1,6 @@
 package com.carebridge.carebridge.Service;
 
 import com.carebridge.carebridge.Dto.AppointmentRequestDTO;
-import com.carebridge.carebridge.Dto.DoctorPatientRequest;
 import com.carebridge.carebridge.Enum.AccessLevel;
 import com.carebridge.carebridge.Enum.RelationshipStatus;
 import com.carebridge.carebridge.Enum.RelationshipType;
@@ -49,7 +48,7 @@ public class DoctorPatientService {
         if(relationship.getAccessLevel()==AccessLevel.FULL_HISTORY){
             throw new RuntimeException("You already granted access to this doctor!");
         }
-        relationship.setStatus(RelationshipStatus.ACTIVE);
+        relationship.setAccessLevel(AccessLevel.FULL_HISTORY);
         relationshipRepo.save(relationship);
     }
     public void revokeRelationship(ObjectId relationshipId, ObjectId userId){
