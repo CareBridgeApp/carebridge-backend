@@ -58,7 +58,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 4. Validate JWT
                 if (Boolean.TRUE.equals(
                         jwtutil.validateToken(jwt))) {
-
                     // 5. Extract userId from JWT
                     userId = jwtutil.extractUserId(jwt);
 
@@ -100,7 +99,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         }
                     }
                 }
-
             } catch (Exception e) {
 
                 // Invalid JWT / invalid ObjectId / etc.
@@ -108,7 +106,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .clearContext();
             }
         }
-
         // 13. Continue request
         filterChain.doFilter(request, response);
     }
