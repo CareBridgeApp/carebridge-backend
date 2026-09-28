@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 2. Find our JWT cookie
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("jwt".equals(cookie.getName())) {
+                if ("accessToken".equals(cookie.getName())) {
                     jwt = cookie.getValue();
                     break;
                 }

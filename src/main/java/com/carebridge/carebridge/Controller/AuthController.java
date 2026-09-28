@@ -58,8 +58,13 @@ public class AuthController {
             }
         }
 
-        if (refreshToken == null ||
-                !jwtUtil.validateToken(refreshToken)) {
+        if (refreshToken == null) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Refresh token missing");
+        }
+
+        if (Boolean.FALSE.equals(jwtUtil.validateToken(refreshToken))) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body("Refresh token expired or invalid");
