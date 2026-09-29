@@ -144,7 +144,7 @@ public class AuthController {
                             .path("/api/auth/refresh")
                             .maxAge(Duration.ofDays(7))
                             .build();
-            ResponseCookie accessCookie=ResponseCookie.from("jwt",accessToken)
+            ResponseCookie accessCookie=ResponseCookie.from("accessToken",accessToken)
                     .httpOnly(true)
                     .secure(true)
                     .sameSite("None")
