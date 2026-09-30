@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+###Untrack JWTfilter###
+src/main/java/com/carebridge/carebridge/Filter/JWTfilter.java
