@@ -31,8 +31,6 @@ public class AppSecurity {
     @Autowired
     private UserServiceAuth CustomUserDetails;
     @Autowired
-    private JWTfilter jwtfilter;
-    @Autowired
     private JwtAuthenticationFilter  jwtAuthenticationFilter;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
