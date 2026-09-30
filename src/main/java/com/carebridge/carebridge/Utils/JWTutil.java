@@ -1,6 +1,7 @@
 package com.carebridge.carebridge.Utils;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -89,6 +90,11 @@ public class JWTutil {
 
     // Validate JWT
     public Boolean validateToken(String token) {
-        return !isTokenExpired(token);
+        try {
+            extractAllClaims(token);   // checks signature AND expiry, throws if bad
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;              // expired, tampered, malformed, or empty
+        }
     }
 }

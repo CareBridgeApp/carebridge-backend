@@ -135,7 +135,7 @@ public class AuthController {
             authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(loginEntry.getEmail(), loginEntry.getPassword()));
             String accessToken = jwtUtil.generateToken(user.getId().toHexString());
-            String refreshToken = jwtUtil.generateToken(user.getId().toHexString());
+            String refreshToken = jwtUtil.generateRefreshToken(user.getId().toHexString());
             ResponseCookie refreshCookie =
                     ResponseCookie.from("refreshToken", refreshToken)
                             .httpOnly(true)

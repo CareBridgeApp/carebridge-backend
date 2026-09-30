@@ -14,21 +14,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Optional;
-
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
     private final JWTutil jwtutil;
     private final UserRepo userrepo;
-
     public JwtAuthenticationFilter(
             JWTutil jwtutil,
             UserRepo userrepo) {
-
         this.jwtutil = jwtutil;
         this.userrepo = userrepo;
     }
@@ -38,7 +32,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain)
             throws ServletException, IOException {
-
         String jwt = null;
         String userId = null;
         // 1. Get cookies from the request
@@ -100,7 +93,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     }
                 }
             } catch (Exception e) {
-
                 // Invalid JWT / invalid ObjectId / etc.
                 SecurityContextHolder
                         .clearContext();
