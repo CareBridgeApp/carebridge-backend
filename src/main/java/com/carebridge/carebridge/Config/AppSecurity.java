@@ -40,6 +40,7 @@ public class AppSecurity {
                         .requestMatchers("/relationship/**").authenticated()
                         .requestMatchers("/medical-records/**").authenticated()
                         .requestMatchers("/api/auth/me").authenticated()
+                        .requestMatchers("/prescription/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .exceptionHandling(e->e.authenticationEntryPoint(
@@ -73,7 +74,7 @@ public class AppSecurity {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("http://localhost:5173","http://192.168.0.5:5173")
+                List.of("http://localhost:5173","https://carebridge-silk.vercel.app")
         );
 
         configuration.setAllowedMethods(
