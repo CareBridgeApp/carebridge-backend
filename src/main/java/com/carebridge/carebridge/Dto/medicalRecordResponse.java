@@ -1,16 +1,18 @@
 package com.carebridge.carebridge.Dto;
 
-import com.carebridge.carebridge.Utils.Medicine;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 
-import java.util.List;
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreatePrescriptionRequest {
+public class medicalRecordResponse {
     private String medicalRecordId;
-    private List<Medicine> medicines;
+    private String diagnosis;
+    private String notes;
+    private LocalDateTime recordDate;
 }

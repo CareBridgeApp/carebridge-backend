@@ -11,4 +11,5 @@ public class MedicalRecordRequest {
     private String appointmentId;
     private String diagnosis;
     private String notes;
+    private String patientId;
 }

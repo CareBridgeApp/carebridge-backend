@@ -80,7 +80,7 @@ public class AuthController {
                         )
                         .httpOnly(true)
                         .secure(true)
-                        .sameSite("Lax")
+                        .sameSite("None")
                         .path("/")
                         .maxAge(Duration.ofMinutes(15))
                         .build();
@@ -99,7 +99,7 @@ public class AuthController {
                 ResponseCookie.from("accessToken", "")
                         .httpOnly(true)
                         .secure(true)
-                        .sameSite("Lax")
+                        .sameSite("None")
                         .path("/")
                         .maxAge(0)
                         .build();
@@ -108,7 +108,7 @@ public class AuthController {
                 ResponseCookie.from("refreshToken", "")
                         .httpOnly(true)
                         .secure(true)
-                        .sameSite("Lax")
+                        .sameSite("None")
                         .path("/api/auth/refresh")
                         .maxAge(0)
                         .build();
@@ -149,7 +149,7 @@ public class AuthController {
                     .secure(true)
                     .sameSite("None")
                     .path("/")
-                    .maxAge(Duration.ofHours(4))
+                    .maxAge(Duration.ofMinutes(15))
                     .build();
             String role=user.getRole();
             String name=null;

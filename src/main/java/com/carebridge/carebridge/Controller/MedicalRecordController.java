@@ -1,6 +1,7 @@
 package com.carebridge.carebridge.Controller;
 
 import com.carebridge.carebridge.Dto.MedicalRecordRequest;
+import com.carebridge.carebridge.Dto.medicalRecordResponse;
 import com.carebridge.carebridge.Service.MedicalRecordService;
 import com.carebridge.carebridge.entity.MedicalRecord;
 import com.carebridge.carebridge.entity.UserDetails;
@@ -67,6 +68,20 @@ public class MedicalRecordController {
             ObjectId PatientId=new ObjectId(patientId);
             List<MedicalRecord>records=medicalRecordService.getMedicalRecords(PatientId,id);
             return new ResponseEntity<>(records,HttpStatus.OK);
+        }catch(Exception e){
+            return new ResponseEntity<>(Map.of("message",e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @PostMapping("doctor/update/{medicalRecordId}")
+    public ResponseEntity<?>updateMedicalRecord(@RequestBody MedicalRecordRequest request
+            ,@PathVariable("medicalRecordId") String medicalRecordId){
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            ObjectId id = userDetails.getId();
+            ObjectId MedicalRecordId=new ObjectId(medicalRecordId);
+            medicalRecordResponse response=medicalRecordService.updateMedicalRecord(request,id,MedicalRecordId);
+            return new ResponseEntity<>(response,HttpStatus.OK);
         }catch(Exception e){
             return new ResponseEntity<>(Map.of("message",e.getMessage()), HttpStatus.BAD_REQUEST);
         }

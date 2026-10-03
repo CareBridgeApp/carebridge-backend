@@ -13,6 +13,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.carebridge.carebridge.Dto.medicalRecordResponse;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -111,5 +112,27 @@ public class MedicalRecordService {
         record.setNotes(request.getNotes());
         record.setRecordDate(LocalDateTime.now());
         return medicalRecordRepo.save(record);
+    }
+    @Transactional
+    public medicalRecordResponse updateMedicalRecord(MedicalRecordRequest request,ObjectId userId,ObjectId medicalRecordId) {
+        DoctorDetails doctor=doctorRepo.findByUserid(userId);
+        if(doctor==null){
+            throw new RuntimeException("You are not authorized to update this record!");
+        }
+        ObjectId doctorId=doctor.getId();
+        MedicalRecord record=medicalRecordRepo.findById(medicalRecordId).orElseThrow(()->new RuntimeException("medical record not found"));
+        if(!record.getDoctorId().equals(doctor.getId())){
+            throw new RuntimeException("You are not authorized to update this record!");
+        }
+        record.setDiagnosis(request.getDiagnosis());
+        record.setNotes(request.getNotes());
+        record.setRecordDate(LocalDateTime.now());
+        medicalRecordRepo.save(record);
+        medicalRecordResponse response=new medicalRecordResponse();
+        response.setDiagnosis(record.getDiagnosis());
+        response.setNotes(record.getNotes());
+        response.setRecordDate(LocalDateTime.now());
+        response.setMedicalRecordId(record.getId().toHexString());
+        return response;
     }
 }

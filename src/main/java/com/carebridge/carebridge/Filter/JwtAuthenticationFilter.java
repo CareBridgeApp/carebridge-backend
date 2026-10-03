@@ -98,7 +98,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .clearContext();
             }
         }
-        // 13. Continue request
+        // 13.Continue request
         filterChain.doFilter(request, response);
     }
 }
