@@ -44,12 +44,23 @@ public class PublicController {
         if (user != null) {
             PatientDetails patient = patientRepo.findByUserid(userDetails.getId());
             if (patient != null) {
-                return new ResponseEntity<>(Map.of("message", "Profile already exists for this user"), HttpStatus.UNPROCESSABLE_ENTITY);
-            }
-            else{
+                return new ResponseEntity<>(Map.of("message", "Profile already exists for this user"), HttpStatus.BAD_REQUEST);
+            } else {
+                DoctorDetails doctor =
+                        doctorRepo.findByUserid(userDetails.getId());
+                if (doctor != null) {
+                    return new ResponseEntity<>(
+                            Map.of("message", "Profile already exists for this user"),
+                            HttpStatus.BAD_REQUEST
+                    );
+                }
                 userService.saveuserdetails(userDetails);
-                return new ResponseEntity<>(Map.of("message", "User Details have been updated successfully!"
-                        ,"userId",userDetails.getId().toHexString()), HttpStatus.CREATED);
+                return new ResponseEntity<>(
+                        Map.of(
+                                "message", "User Details have been successfully updated!",
+                                "userId", userDetails.getId().toHexString()
+                        ), HttpStatus.CREATED
+                );
             }
         }
         userService.saveuserdetails(userDetails);
