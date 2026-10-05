@@ -153,7 +153,7 @@ public class AuthController {
                     .build();
             String role=user.getRole();
             String name=null;
-            if(role=="doctor"){
+            if(Objects.equals(role, "Doctor")){
                 DoctorDetails doctor = doctorRepo.findByUserid(user.getId());
                 name=doctor.getName();
             }else{
