@@ -1,4 +1,5 @@
 package com.carebridge.carebridge.Config;
+import com.carebridge.carebridge.Filter.JWTfilter;
 import com.carebridge.carebridge.Filter.JwtAuthenticationFilter;
 import com.carebridge.carebridge.Service.UserServiceAuth;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,7 @@ public class AppSecurity {
                         .requestMatchers("/medical-records/**").authenticated()
                         .requestMatchers("/api/auth/me").authenticated()
                         .requestMatchers("/prescription/**").authenticated()
+                        .requestMatchers("/ai/chat/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .exceptionHandling(e->e.authenticationEntryPoint(

@@ -78,7 +78,6 @@
 			<artifactId>jjwt-api</artifactId>
 			<version>0.12.6</version>
 		</dependency>
-
 		<!-- JWT Implementation -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
@@ -86,7 +85,6 @@
 			<version>0.12.6</version>
 			<scope>runtime</scope>
 		</dependency>
-
 		<!-- JWT Jackson -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
@@ -94,20 +92,49 @@
 			<version>0.12.6</version>
 			<scope>runtime</scope>
 		</dependency>
-
 		<!-- Cloudinary -->
 		<dependency>
 			<groupId>com.cloudinary</groupId>
 			<artifactId>cloudinary-http44</artifactId>
 			<version>1.39.0</version>
 		</dependency>
-
 		<!-- Actuator -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+		<!--Gemini-->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-google-genai</artifactId>
+		</dependency>
+		<!--embedding model-->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-google-genai-embedding</artifactId>
+		</dependency>
+		<!--Mongodb VectorStore-->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-vector-store-mongodb-atlas</artifactId>
+		</dependency>
+		<!--Chat Memory-->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-chat-memory-repository-mongodb</artifactId>
+		</dependency>
 	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.ai</groupId>
+				<artifactId>spring-ai-bom</artifactId>
+				<version>1.1.8</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<plugins>

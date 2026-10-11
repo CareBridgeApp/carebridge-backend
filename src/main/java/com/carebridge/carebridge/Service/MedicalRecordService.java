@@ -30,6 +30,8 @@ public class MedicalRecordService {
     private PatientRepo patientRepo;
     @Autowired
     private DoctorPatientRelationshipRepo relationshipRepo;
+    @Autowired
+    private MedicalRecordEmbeddingService medicalRecordEmbeddingService;
     @Transactional
     public MedicalRecord createMedicalRecord(MedicalRecordRequest request,ObjectId userId) {
         //Find Appointment
@@ -57,7 +59,9 @@ public class MedicalRecordService {
         medicalRecord.setNotes(request.getNotes());
         medicalRecord.setPatientId(appointment.getPatientId());
         medicalRecord.setDoctorId(appointment.getDoctorId());
-        return medicalRecordRepo.save(medicalRecord);
+        medicalRecord=medicalRecordRepo.save(medicalRecord);
+        medicalRecordEmbeddingService.saveMedicalEmbeddings(medicalRecord);
+        return medicalRecord;
     }
     public List<MedicalRecord> getMyMedicalRecords(ObjectId userId) {
         PatientDetails patient=patientRepo.findByUserid(userId);
@@ -74,7 +78,7 @@ public class MedicalRecordService {
         DoctorDetails doctor=doctorRepo.findByUserid(userId);
         ObjectId doctorId=doctor.getId();
         doctorPatientRelationship relationship=relationshipRepo.findByDoctorIdAndPatientId(doctorId,patientId).get();
-        if(!relationship.getDoctorId().equals(doctorId)){
+        if(relationship==null){
             throw new RuntimeException("You are not authorized to view this Patients medical records");
         }
         if(relationship.getAccessLevel()== AccessLevel.CONSULTATION_ONLY){
@@ -91,7 +95,7 @@ public class MedicalRecordService {
         DoctorDetails doctor=doctorRepo.findByUserid(userId);
         ObjectId doctorId=doctor.getId();
         doctorPatientRelationship relationship=relationshipRepo.findByDoctorIdAndPatientId(doctorId,patientId).get();
-        if(!relationship.getDoctorId().equals(doctorId)){
+        if(relationship==null){
             throw new RuntimeException("You are not authorized to view this Patients medical records");
         }
         List<MedicalRecord>records=medicalRecordRepo.findByDoctorIdAndPatientId(doctorId,patientId);
