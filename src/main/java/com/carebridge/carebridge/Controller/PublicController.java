@@ -117,5 +117,9 @@ public class PublicController {
     public ResponseEntity<?> awake() {
         return new ResponseEntity<>(HttpStatus.OK);
     }
+    @GetMapping("/running")
+    public ResponseEntity<?> running() {
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 }
