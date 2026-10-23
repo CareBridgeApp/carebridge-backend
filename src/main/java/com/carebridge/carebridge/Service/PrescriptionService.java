@@ -4,11 +4,14 @@ import com.carebridge.carebridge.Dto.CreatePrescriptionRequest;
 import com.carebridge.carebridge.Dto.prescriptionResponse;
 import com.carebridge.carebridge.Enum.AccessLevel;
 import com.carebridge.carebridge.Repository.*;
+import com.carebridge.carebridge.Utils.Medicine;
+import com.carebridge.carebridge.Utils.MedicineDateUtil;
 import com.carebridge.carebridge.entity.*;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +28,8 @@ public class PrescriptionService {
     private DoctorPatientRelationshipRepo relationshipRepo;
     @Autowired
     private PatientRepo patientRepo;
+    @Autowired
+    private MedicineDateUtil  medicineDateUtil;
     public prescriptionResponse createPrescription(CreatePrescriptionRequest request, ObjectId userId) {
         DoctorDetails doctor=doctorRepo.findByUserid(userId);
         if(doctor==null) {
@@ -46,7 +51,14 @@ public class PrescriptionService {
         prescription.setPatientId(patientId);
         prescription.setDoctorId(doctorId);
         prescription.setMedicalRecordId(record.getId());
-        prescription.setMedicines(request.getMedicines());
+        LocalDate startDate=LocalDate.now();
+        List<Medicine>medicines=request.getMedicines();
+        for(Medicine medicine:medicines){
+            medicine.setStartDate(startDate);
+            LocalDate endDate=medicineDateUtil.calculateEndDate(startDate,medicine.getDuration());
+            medicine.setEndDate(endDate);
+        }
+        prescription.setMedicines(medicines);
         prescription.setCreatedAt(LocalDateTime.now());
         prescriptionRepo.save(prescription);
         prescriptionResponse response=new prescriptionResponse();

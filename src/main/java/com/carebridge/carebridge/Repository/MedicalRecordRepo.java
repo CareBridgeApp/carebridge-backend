@@ -14,4 +14,13 @@ public interface MedicalRecordRepo extends MongoRepository<MedicalRecord, Object
 
     List<MedicalRecord> findByDoctorId(ObjectId doctorId);
     List<MedicalRecord> findByDoctorIdAndPatientId(ObjectId doctorId, ObjectId patientId);
+    List<MedicalRecord> findByPatientIdAndTitleContainingIgnoreCase(
+            ObjectId patientId,
+            String title
+    );
+    List<MedicalRecord> findByPatientIdAndDoctorIdAndTitleContainingIgnoreCase(
+            ObjectId patientId,
+            ObjectId doctorId,
+            String title
+    );
 }

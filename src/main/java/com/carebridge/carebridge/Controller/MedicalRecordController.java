@@ -2,8 +2,11 @@ package com.carebridge.carebridge.Controller;
 
 import com.carebridge.carebridge.Dto.MedicalRecordRequest;
 import com.carebridge.carebridge.Dto.medicalRecordResponse;
+import com.carebridge.carebridge.Repository.PatientRepo;
+import com.carebridge.carebridge.Service.MedicalRecordSearchService;
 import com.carebridge.carebridge.Service.MedicalRecordService;
 import com.carebridge.carebridge.entity.MedicalRecord;
+import com.carebridge.carebridge.entity.PatientDetails;
 import com.carebridge.carebridge.entity.UserDetails;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,8 @@ import java.util.Map;
 public class MedicalRecordController {
     @Autowired
     private MedicalRecordService medicalRecordService;
+    @Autowired
+    private MedicalRecordSearchService medicalRecordSearchService;
     @PostMapping("/create")
     public ResponseEntity<?> addMedicalRecord(@RequestBody MedicalRecordRequest request){
         try{
@@ -39,7 +44,7 @@ public class MedicalRecordController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             ObjectId id = userDetails.getId();
-            List<MedicalRecord>records=medicalRecordService.getMyMedicalRecords(id);
+            List<medicalRecordResponse>records=medicalRecordService.getMyMedicalRecords(id);
             return new ResponseEntity<>(records, HttpStatus.OK);
         }catch(Exception e){
             return new ResponseEntity<>(Map.of("message","Error while retrieving medical records"), HttpStatus.BAD_REQUEST);
@@ -53,7 +58,7 @@ public class MedicalRecordController {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             ObjectId id = userDetails.getId();
             ObjectId PatientId=new ObjectId(patientId);
-            List<MedicalRecord>records=medicalRecordService.getAllPatientsMedicalRecords(PatientId,id);
+            List<medicalRecordResponse>records=medicalRecordService.getAllPatientsMedicalRecords(PatientId,id);
             return new ResponseEntity<>(records,HttpStatus.OK);
         }catch(Exception e){
             return new ResponseEntity<>(Map.of("message",e.getMessage()), HttpStatus.BAD_REQUEST);
@@ -66,7 +71,7 @@ public class MedicalRecordController {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             ObjectId id = userDetails.getId();
             ObjectId PatientId=new ObjectId(patientId);
-            List<MedicalRecord>records=medicalRecordService.getMedicalRecords(PatientId,id);
+            List<medicalRecordResponse>records=medicalRecordService.getMedicalRecords(PatientId,id);
             return new ResponseEntity<>(records,HttpStatus.OK);
         }catch(Exception e){
             return new ResponseEntity<>(Map.of("message",e.getMessage()), HttpStatus.BAD_REQUEST);
@@ -86,5 +91,29 @@ public class MedicalRecordController {
             return new ResponseEntity<>(Map.of("message",e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
-
+    @GetMapping("/search")
+    public ResponseEntity<?> searchByTitlePatient(@RequestParam("title") String title){
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            ObjectId id = userDetails.getId();
+            List<medicalRecordResponse>response=medicalRecordSearchService.searchByTitleForPatient(id,title);
+            return new ResponseEntity<>(response,HttpStatus.OK);
+        }catch(Exception e){
+            return new ResponseEntity<>(Map.of("message",e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/doctor/search")
+    public ResponseEntity<?> searchByTitleDoctor(@RequestParam("title") String title,@RequestParam("id") String id){
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            ObjectId userId = userDetails.getId();
+            ObjectId patientId=new ObjectId(id);
+            List<medicalRecordResponse>response=medicalRecordSearchService.searchByTitleForDoctor(userId,patientId,title);
+            return new ResponseEntity<>(response,HttpStatus.OK);
+        }catch(Exception e){
+            return new ResponseEntity<>(Map.of("message",e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
 }

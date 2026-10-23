@@ -1,8 +1,10 @@
 package com.carebridge.carebridge.Controller;
 
+import com.carebridge.carebridge.Enum.IntentType;
 import com.carebridge.carebridge.Repository.DoctorRepo;
 import com.carebridge.carebridge.Repository.PatientRepo;
 import com.carebridge.carebridge.Repository.UserRepo;
+import com.carebridge.carebridge.Service.IntentClassificationService;
 import com.carebridge.carebridge.Service.UserService;
 import com.carebridge.carebridge.Utils.JWTutil;
 import com.carebridge.carebridge.Dto.LoginEntry;
@@ -15,10 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -38,6 +37,8 @@ public class PublicController {
     private DoctorRepo doctorRepo;
     @Autowired
     private UserRepo  userRepo;
+    @Autowired
+    private IntentClassificationService classifier;
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody UserDetails userDetails) {
         UserDetails user = userRepo.findByEmail(userDetails.getEmail());
@@ -101,6 +102,20 @@ public class PublicController {
         }catch(Exception e){
             return new ResponseEntity<>(Map.of("message", "Signup Failed!"), HttpStatus.BAD_REQUEST);
         }
+    }
+    @PostMapping("/intent")
+    public Map<String, String> test(
+            @RequestBody Map<String, String> body) {
+
+        IntentType intent = classifier.classify(
+                body.get("message")
+        );
+
+        return Map.of("intent", intent.name());
+    }
+    @GetMapping("/awake")
+    public ResponseEntity<?> awake() {
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

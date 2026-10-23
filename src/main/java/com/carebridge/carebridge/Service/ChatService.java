@@ -1,6 +1,7 @@
 package com.carebridge.carebridge.Service;
 
 import com.carebridge.carebridge.Enum.AccessLevel;
+import com.carebridge.carebridge.Enum.IntentType;
 import com.carebridge.carebridge.Repository.DoctorPatientRelationshipRepo;
 import com.carebridge.carebridge.Repository.DoctorRepo;
 import com.carebridge.carebridge.Repository.PatientRepo;
@@ -30,22 +31,54 @@ public class ChatService {
     private DoctorRepo doctorRepo;
     @Autowired
     private DoctorPatientRelationshipRepo relationshipRepo;
-    @Value("classpath:/Prompts/LLMprompts_1.st")
-    private Resource systemmessage1;
-    @Value("classpath:/Prompts/LLMprompts.st")
-    private Resource systemmessage2;
+    @Autowired
+    private IntentClassificationService classificationService;
+
+    @Value("classpath:Prompts/DoctorRecordAssistantPrompt.st")
+    private Resource doctorPrompt;
+
+    @Value("classpath:Prompts/GeneralAssistantPrompt.st")
+    private Resource generalPrompt;
+
+    @Value("classpath:Prompts/HealthAssistantPrompt.st")
+    private Resource healthPrompt;
+
+    @Value("classpath:Prompts/PatientRecordAssistantPrompt.st")
+    private Resource patientPrompt;
     public Flux<String> askMyRecords(String questions,ObjectId userId){
         PatientDetails patient=patientRepo.findByUserid(userId);
         if(patient==null){
             throw new RuntimeException("You need to login first!");
         }
         ObjectId patientId=patient.getId();
-        String context= medicalRecordEmbeddingService.getDataFromMedicalRecord(questions,patientId);
         String conversation_id=patientId.toString();
+        if(classificationService.classify(questions).equals(IntentType.GENERAL)){
+            return chatClient
+                    .prompt()
+                    .system(system -> system
+                            .text(generalPrompt)
+                    )
+                    .user(questions)
+                    .advisors(advisor->advisor.param(ChatMemory.CONVERSATION_ID,conversation_id))
+                    .stream()
+                    .content();
+        }
+        if(classificationService.classify(questions).equals(IntentType.HEALTH)){
+            return chatClient
+                    .prompt()
+                    .system(system -> system
+                            .text(healthPrompt)
+                    )
+                    .user(questions)
+                    .advisors(advisor->advisor.param(ChatMemory.CONVERSATION_ID,conversation_id))
+                    .stream()
+                    .content();
+        }
+        String context= medicalRecordEmbeddingService.getDataFromMedicalRecord(questions,patientId);
         return chatClient
                 .prompt()
                 .system(system -> system
-                        .text(systemmessage1)
+                        .text(patientPrompt)
                         .param("context", context)
                 )
                 .user(questions)
@@ -67,12 +100,34 @@ public class ChatService {
         if(relationship.getAccessLevel().equals(AccessLevel.CONSULTATION_ONLY)){
             throw new RuntimeException("You are not authorized to access this patient's medical records.");
         }
+        String conversation_id= patientId.toString()+"_"+doctorId.toString();
+        if(classificationService.classify(questions).equals(IntentType.GENERAL)){
+            return chatClient
+                    .prompt()
+                    .system(system -> system
+                            .text(generalPrompt)
+                    )
+                    .user(questions)
+                    .advisors(advisor->advisor.param(ChatMemory.CONVERSATION_ID,conversation_id))
+                    .stream()
+                    .content();
+        }
+        if(classificationService.classify(questions).equals(IntentType.HEALTH)){
+            return chatClient
+                    .prompt()
+                    .system(system -> system
+                            .text(healthPrompt)
+                    )
+                    .user(questions)
+                    .advisors(advisor->advisor.param(ChatMemory.CONVERSATION_ID,conversation_id))
+                    .stream()
+                    .content();
+        }
         String context= medicalRecordEmbeddingService.getDataFromMedicalRecord(questions,patientId);
-        String conversation_id=patientId.toString()+"_"+doctorId.toString();
         return chatClient
                 .prompt()
                 .system(system -> system
-                        .text(systemmessage2)
+                        .text(doctorPrompt)
                         .param("context", context)
                 )
                 .user(questions)

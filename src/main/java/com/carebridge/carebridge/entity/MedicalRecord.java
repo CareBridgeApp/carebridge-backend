@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Document(collection = "MedicalRecords")
 @Data
@@ -22,4 +23,6 @@ public class MedicalRecord {
     private LocalDateTime recordDate;
     private String diagnosis;
     private String notes;
+    private String title;
+    private List<String> testsDone;
 }

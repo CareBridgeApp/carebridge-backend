@@ -1,8 +1,11 @@
 package com.carebridge.carebridge.Dto;
 
+import com.carebridge.carebridge.entity.MedicalRecord;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -11,5 +14,6 @@ public class MedicalRecordRequest {
     private String appointmentId;
     private String diagnosis;
     private String notes;
-    private String patientId;
+    private List<String> testsDone;
+    private String title;
 }

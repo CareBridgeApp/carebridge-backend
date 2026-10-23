@@ -59,22 +59,27 @@ public class MedicalRecordService {
         medicalRecord.setNotes(request.getNotes());
         medicalRecord.setPatientId(appointment.getPatientId());
         medicalRecord.setDoctorId(appointment.getDoctorId());
+        medicalRecord.setTestsDone(request.getTestsDone());
+        medicalRecord.setTitle(request.getTitle());
         medicalRecord=medicalRecordRepo.save(medicalRecord);
         medicalRecordEmbeddingService.saveMedicalEmbeddings(medicalRecord);
         return medicalRecord;
     }
-    public List<MedicalRecord> getMyMedicalRecords(ObjectId userId) {
+    public List<medicalRecordResponse> getMyMedicalRecords(ObjectId userId) {
         PatientDetails patient=patientRepo.findByUserid(userId);
-        return medicalRecordRepo.findByPatientId(patient.getId());
+        List<MedicalRecord> records=medicalRecordRepo.findByPatientId(patient.getId());
+        return records.stream().map(record->{
+            medicalRecordResponse dto=new medicalRecordResponse();
+            dto.setMedicalRecordId(record.getId().toHexString());
+            dto.setRecordDate(record.getRecordDate());
+            dto.setDiagnosis(record.getDiagnosis());
+            dto.setNotes(record.getNotes());
+            dto.setTestsDone(record.getTestsDone());
+            dto.setTitle(record.getTitle());
+            return dto;
+        }).toList();
     }
-    public MedicalRecord getMedicalRecord(ObjectId medicalRecordId,ObjectId userId) {
-        MedicalRecord record=medicalRecordRepo.findById(medicalRecordId).orElseThrow(()->new RuntimeException("medical record not found"));
-        if(record.getPatientId().equals(userId)){
-            return record;
-        }
-        throw new RuntimeException("medical record does not belong to this Patient");
-    }
-    public List<MedicalRecord> getAllPatientsMedicalRecords(ObjectId patientId,ObjectId userId) {
+    public List<medicalRecordResponse> getAllPatientsMedicalRecords(ObjectId patientId,ObjectId userId) {
         DoctorDetails doctor=doctorRepo.findByUserid(userId);
         ObjectId doctorId=doctor.getId();
         doctorPatientRelationship relationship=relationshipRepo.findByDoctorIdAndPatientId(doctorId,patientId).get();
@@ -88,10 +93,19 @@ public class MedicalRecordService {
         if(records.isEmpty()){
             throw new RuntimeException("No Medical records found for this Patient");
         }
-        return records;
+        return records.stream().map(record->{
+            medicalRecordResponse dto=new medicalRecordResponse();
+            dto.setMedicalRecordId(record.getId().toHexString());
+            dto.setRecordDate(record.getRecordDate());
+            dto.setDiagnosis(record.getDiagnosis());
+            dto.setNotes(record.getNotes());
+            dto.setTestsDone(record.getTestsDone());
+            dto.setTitle(record.getTitle());
+            return dto;
+        }).toList();
     }
 
-    public List<MedicalRecord> getMedicalRecords(ObjectId patientId,ObjectId userId) {
+    public List<medicalRecordResponse> getMedicalRecords(ObjectId patientId,ObjectId userId) {
         DoctorDetails doctor=doctorRepo.findByUserid(userId);
         ObjectId doctorId=doctor.getId();
         doctorPatientRelationship relationship=relationshipRepo.findByDoctorIdAndPatientId(doctorId,patientId).get();
@@ -102,20 +116,16 @@ public class MedicalRecordService {
         if(records.isEmpty()){
             throw new RuntimeException("No Medical records found for this Patient");
         }
-        return records;
-    }
-    @Transactional
-    public MedicalRecord updateMedicalRecord(ObjectId medicalRecordId,MedicalRecordRequest request,ObjectId userId) {
-        MedicalRecord record=medicalRecordRepo.findById(medicalRecordId).orElseThrow(()->new RuntimeException("medical record not found"));
-        //verify the looged in user
-        DoctorDetails doctor=doctorRepo.findByUserid(userId);
-        if(!record.getDoctorId().equals(doctor.getId())){
-            throw new RuntimeException("You are not allowed to update this record!");
-        }
-        record.setDiagnosis(request.getDiagnosis());
-        record.setNotes(request.getNotes());
-        record.setRecordDate(LocalDateTime.now());
-        return medicalRecordRepo.save(record);
+        return records.stream().map(record->{
+            medicalRecordResponse dto=new medicalRecordResponse();
+            dto.setMedicalRecordId(record.getId().toHexString());
+            dto.setRecordDate(record.getRecordDate());
+            dto.setDiagnosis(record.getDiagnosis());
+            dto.setNotes(record.getNotes());
+            dto.setTestsDone(record.getTestsDone());
+            dto.setTitle(record.getTitle());
+            return dto;
+        }).toList();
     }
     @Transactional
     public medicalRecordResponse updateMedicalRecord(MedicalRecordRequest request,ObjectId userId,ObjectId medicalRecordId) {
@@ -131,12 +141,87 @@ public class MedicalRecordService {
         record.setDiagnosis(request.getDiagnosis());
         record.setNotes(request.getNotes());
         record.setRecordDate(LocalDateTime.now());
+        record.setTitle(request.getTitle());
+        record.setTestsDone(request.getTestsDone());
         medicalRecordRepo.save(record);
         medicalRecordResponse response=new medicalRecordResponse();
         response.setDiagnosis(record.getDiagnosis());
         response.setNotes(record.getNotes());
         response.setRecordDate(LocalDateTime.now());
         response.setMedicalRecordId(record.getId().toHexString());
+        response.setTitle(request.getTitle());
+        response.setTestsDone(request.getTestsDone());
         return response;
     }
+//    public List<medicalRecordResponse> searchByTitleForPatient(ObjectId userId,String title){
+//        if(title==null || title.isBlank()){
+//            throw new RuntimeException("Title cannot be null or blank");
+//        }
+//        PatientDetails patientDetails=patientRepo.findByUserid(userId);
+//        if(patientDetails==null){
+//            throw new RuntimeException("You are not authorized to view this Patients medical records");
+//        }
+//        ObjectId patientId=patientDetails.getId();
+//        List<MedicalRecord>records=medicalRecordRepo.findByPatientIdAndTitleContainingIgnoreCase(patientId,title);
+//        if(records.isEmpty()){
+//            throw new RuntimeException("No Medical records found for this Patient");
+//        }
+//        return records.stream().map(record->{
+//            medicalRecordResponse dto=new medicalRecordResponse();
+//            dto.setMedicalRecordId(record.getId().toHexString());
+//            dto.setRecordDate(record.getRecordDate());
+//            dto.setDiagnosis(record.getDiagnosis());
+//            dto.setNotes(record.getNotes());
+//            dto.setTestsDone(record.getTestsDone());
+//            dto.setTitle(record.getTitle());
+//            return dto;
+//        }).toList();
+//    }
+//    public List<medicalRecordResponse>searchByTitleForDoctor(ObjectId userId,ObjectId patientId,String title){
+//        if(title==null || title.isBlank()){
+//            throw new RuntimeException("Title cannot be null or blank");
+//        }
+//        DoctorDetails doctorDetails=doctorRepo.findByUserid(userId);
+//        if(doctorDetails==null){
+//            throw new RuntimeException("You are not authorized to view this Patients medical records");
+//        }
+//        ObjectId doctorId=doctorDetails.getId();
+//        doctorPatientRelationship relationship=relationshipRepo.findByDoctorIdAndPatientId(doctorId,patientId).get();
+//        if(relationship==null){
+//            throw new RuntimeException("You are not authorized to view this Patients medical records");
+//        }
+//        if(!relationship.getDoctorId().equals(doctorId)){
+//            throw new RuntimeException("You are not authorized to view this Patients medical records");
+//        }
+//        if(relationship.getAccessLevel().equals(AccessLevel.CONSULTATION_ONLY)){
+//            List<MedicalRecord>records=medicalRecordRepo.findByPatientIdAndDoctorIdAndTitleContainingIgnoreCase(patientId,doctorId,title);
+//            if(records.isEmpty()){
+//                throw new RuntimeException("No Medical records found for this Patient");
+//            }
+//            return records.stream().map(record->{
+//                medicalRecordResponse dto=new medicalRecordResponse();
+//                dto.setMedicalRecordId(record.getId().toHexString());
+//                dto.setRecordDate(record.getRecordDate());
+//                dto.setDiagnosis(record.getDiagnosis());
+//                dto.setNotes(record.getNotes());
+//                dto.setTestsDone(record.getTestsDone());
+//                dto.setTitle(record.getTitle());
+//                return dto;
+//            }).toList();
+//        }
+//        List<MedicalRecord>records=medicalRecordRepo.findByPatientIdAndTitleContainingIgnoreCase(patientId,title);
+//        if(records.isEmpty()){
+//            throw new RuntimeException("No Medical records found for this Patient");
+//        }
+//        return records.stream().map(record->{
+//            medicalRecordResponse dto=new medicalRecordResponse();
+//            dto.setMedicalRecordId(record.getId().toHexString());
+//            dto.setRecordDate(record.getRecordDate());
+//            dto.setDiagnosis(record.getDiagnosis());
+//            dto.setNotes(record.getNotes());
+//            dto.setTestsDone(record.getTestsDone());
+//            dto.setTitle(record.getTitle());
+//            return dto;
+//        }).toList();
+//    }
 }
