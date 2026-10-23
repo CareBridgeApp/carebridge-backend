@@ -1,5 +1,4 @@
 package com.carebridge.carebridge.Config;
-import com.carebridge.carebridge.Filter.JWTfilter;
 import com.carebridge.carebridge.Filter.JwtAuthenticationFilter;
 import com.carebridge.carebridge.Service.UserServiceAuth;
 import org.springframework.beans.factory.annotation.Autowired;
